@@ -1,0 +1,37 @@
+This file will contain commands to create all tables used by database
+
+CREATE TABLE IF NOT EXISTS users (
+    userid INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+)  ENGINE=INNODB;
+
+INSERT INTO users(username,password) VALUES("ankit","ankit");
+
+SELECT users.userid,question.questionid, question,username,question.votes,question.created,count(*) FROM question INNER JOIN users ON question.userid = users.userid LEFT JOIN answer ON answer.questionid = answer.questionid GROUP BY question.questionid;
+
+SELECT users.userid,question.questionid, question,username,question.votes,question.created,count(*) as answers FROM question LEFT JOIN answer ON answer.questionid = question.questionid INNER JOIN users ON users.userid = question.questionid GROUP BY question.questionid;
+
+SELECT users.userid,question.questionid as questionid,question,username,question.votes,question.created, IFNULL(COUNT(answer.answerid),0) as answers 
+FROM question,users as tableTemp left join answer ON answer.questionid = tableTemp.questionid WHERE question.userid = users.userid group by tableTemp.questionid;
+
+
+CREATE TABLE IF NOT EXISTS question (
+    questionid INT AUTO_INCREMENT PRIMARY KEY,
+    userid INT,
+    question TEXT NOT NULL,
+    votes INT,
+    createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)  ENGINE=INNODB;
+INSERT INTO question(userid,question,votes) VALUES(1,"This is a sample question3",0);
+
+CREATE TABLE IF NOT EXISTS answer (
+    answerid INT AUTO_INCREMENT PRIMARY KEY,
+    questionid INT,
+    userid INT,
+    answer TEXT NOT NULL,
+    votes INT,
+    createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)  ENGINE=INNODB;
+
+INSERT INTO answer(questionid,userid,answer,votes) VALUES (1,1,"This is a smaple question",0);
