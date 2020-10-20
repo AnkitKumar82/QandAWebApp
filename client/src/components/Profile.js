@@ -91,6 +91,14 @@ class Profile extends Component {
     componentDidMount(){
         this.fetchAllData();
     }
+    componentWillReceiveProps(props){
+        this.setState({
+            token : props.token
+        });
+        if(props.token === null){
+            window.location.href = "/";
+        }
+    }
     hideEditModal = () =>{
         this.setState({
           showEditModal : false,

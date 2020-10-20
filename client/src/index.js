@@ -104,7 +104,7 @@ class App extends Component {
       return (
         <div>
             <Router>
-            <Header hideModal = {()=>{this.hideModal()}} handleLogout={()=>{this.handleLogout()}} handleLogin={()=>{this.showLoginModal()}} userid = {this.state.userid} handleNewQuestion = {()=>{this.handleNewQuestion()}} username = {this.state.username} isLoggedIn = {this.state.isLoggedIn}/>
+            <Header hideModal = {()=>{this.hideModal()}} handleLogout={()=>{this.handleLogout()}} handleLogin={()=>{this.showLoginModal()}} userid={this.state.userid} handleNewQuestion={()=>{this.handleNewQuestion()}} username={this.state.username} isLoggedIn={this.state.isLoggedIn}/>
             <div style={{marginTop:"70px"}} >
                   <Switch>
                       {/* <Route exact path="/" render={(props)=>{
@@ -148,8 +148,8 @@ class App extends Component {
                       }}
                       />
                   </Switch> 
-                  <Login hideModal = {()=>{this.hideModal()}} handleLoginData = {(e)=>{this.handleLoginData(e)}}  showModal={this.state.showLoginModal}/>
-                  <AskQuestion hideModal = {()=>{this.hideModal()}} token = {this.state.token} showModal={this.state.showAskQuestionModal}/>
+                  <Login hideModal={()=>{this.hideModal()}} handleLoginData = {(e)=>{this.handleLoginData(e)}}  showModal={this.state.showLoginModal}/>
+                  <AskQuestion hideModal={()=>{this.hideModal()}} token = {this.state.token} showModal={this.state.showAskQuestionModal}/>
             </div>
           </Router>
         </div>
