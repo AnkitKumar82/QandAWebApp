@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');
 var cors = require('cors');
+let logger = require("./Logger");
 app.use(cors());
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
@@ -23,5 +24,5 @@ let userRoute = require("./routes/user.js");
 app.use("/u",userRoute);
 
 app.listen(process.env.PORT || 5000, ()=>{
-    console.log("App listening at ",process.env.PORT || 5000);
+	logger.debug("App listening at",process.env.PORT || 5000);
 });

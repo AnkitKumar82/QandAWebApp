@@ -101,7 +101,6 @@ class Login extends Component {
                     error : true,
                     errorMessage : response.errorMessage
                 });
-                console.log("Response error", response.errorMessage);
             }else{
                 this.setState({
                     error : false
