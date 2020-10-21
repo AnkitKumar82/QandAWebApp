@@ -1,9 +1,9 @@
 var mysql = require('mysql');
 var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "Ankit@1234",
-  database: "qandadb",
+  host     : process.env.RDS_HOSTNAME,
+  user     : process.env.RDS_USERNAME,
+  password : process.env.RDS_PASSWORD,
+  port     : process.env.RDS_PORT,
   multipleStatements: true
 });
 con.connect(function(err) {
