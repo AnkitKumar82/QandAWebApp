@@ -382,7 +382,7 @@ router.post('/register',async (req,res)=>{
 router.post('/usertoken',async (req, res) => {
     let dataFromJwt = await jwt.jwtVerify(req.body.token);
     if(dataFromJwt!== null){
-        logger.debug({reqBody:req.body,err:err},"User token verification failed");
+        logger.debug({reqBody:req.body},"User token verification failed");
         res.send({
             tokenValid : true,
             userid : dataFromJwt.userid,
