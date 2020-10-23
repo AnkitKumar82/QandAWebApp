@@ -1,5 +1,5 @@
 import axios from "axios";
-const myServerAddr = "http://localhost:5000";
+const myServerAddr = "/api";
 export const getCall = async (data)=>{
     try{
         const response = await axios.get(myServerAddr+data.api);

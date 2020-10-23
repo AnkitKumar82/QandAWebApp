@@ -7,7 +7,8 @@ import {
     Typography,
     Button,
     Paper,
-    Divider
+    Divider,
+    Box
 } from "@material-ui/core";
 import {
     withStyles
@@ -124,7 +125,7 @@ class Question extends Component {
                             </Grid>
                             <Grid key={`${"questionlink"}_username`} item xs={12}>
                                 <Typography className={classes.user}>
-                                    {this.state.answers.length}{` Answer${((this.state.question.answers===1)?"":"s")} `}{'\u2022'}
+                                    {this.state.answers.length}{` Answer${((this.state.answers.length===1)?"":"s")} `}{'\u2022'}
                                     <Link style={{color:"#103070",textDecoration:"none"}} to={`/s/u/${this.state.question.username}`}>
                                         {" "}{this.state.question.username}{" asked"}
                                     </Link>
@@ -155,8 +156,10 @@ class Question extends Component {
                                 justify="space-between"
                                 spacing={1}>
                                 <Grid key={`${answer.answerid}_answerid`} item xs={12}>
-                                    <Typography noWrap className={classes.answer}>
-                                        {answer.answer}
+                                    <Typography className={classes.answer}>
+                                        <Box component="span" my={2} whiteSpace="normal">
+                                            {answer.answer}
+                                        </Box>
                                     </Typography>
                                 </Grid>
                                 <Grid key={`${answer.answerid}_username`} item xs={12}>

@@ -130,7 +130,7 @@ class Profile extends Component {
         if(response!==null){
             if(response.isDone){
                 this.setState({
-                    error : true,
+                    errorPassword : true,
                     errorMessagePassword : "Password Changed!"
                 })
             }else{
