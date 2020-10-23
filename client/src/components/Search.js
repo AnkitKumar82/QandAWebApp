@@ -96,7 +96,6 @@ class Search extends Component {
                     noMoreData : true
                 })
             }
-            console.log("One input :", responseAllQuestions.questions[0]);
         }else{
             window.location.href = "/error"
         }

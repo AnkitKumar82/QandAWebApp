@@ -2,16 +2,19 @@ const express = require('express');
 const jwt = require('../JWT.js');
 const con = require("../mysql.js");
 const bcrypt = require("bcrypt");
+let logger = require("../Logger");
 const saltRounds = 10;
 const router = express.Router();
 var TokenVerify = async (req,res,next)=>{
     let data = await jwt.jwtVerify(req.body.token);
     if(!data){
+        logger.debug({reqBody:req.body},"Token not verified");
         res.send({
             isDone : false,
             errorMessage : "User not logged in or Token Invalid,Clear all cookies and try to login again..."
         })
     }else{
+        logger.debug({reqBody:req.body},"Token verified");
         req.body.username = data.username;
         req.body.userid = data.userid;
         next();
@@ -20,6 +23,7 @@ var TokenVerify = async (req,res,next)=>{
 router.use('/r',TokenVerify);
 router.post('/r/askquestion',async(req,res)=>{
     if(req.body.question.length === 0){
+        logger.debug({reqBody:req.body},"Quesion length zero error, sending null");
         res.send(null);
         return;
     }
@@ -29,12 +33,13 @@ router.post('/r/askquestion',async(req,res)=>{
     console.log(mysqlquery);
     con.query(mysqlquery,(err,responseQuestionAdd)=>{
         if(err){
-            console.log(err);
+            logger.debug({reqBody:req.body,err:err},"Error on ask question insert query");
             res.send({
                 isDone : false,
                 errorMessage : "Server side issue"
             })
         }else{
+            logger.debug({reqBody:req.body,err:err},"Ask question insert query success");
             res.send({
                 isDone: true
             });
@@ -45,6 +50,7 @@ router.post('/r/addanswer',async(req,res)=>{
     let questionid = req.body.questionid;
     let answer =  req.body.answer;
     if(answer.length === 0){
+        logger.debug({reqBody:req.body},"Error on add answer,answer length 0");
         res.send(null);
         return;
     }
@@ -55,7 +61,7 @@ router.post('/r/addanswer',async(req,res)=>{
 
     con.query(mysqlquery,(err,responseQuestionExist)=>{
         if(err || responseQuestionExist.length == 0){
-            console.log(err);
+            logger.debug({reqBody:req.body,err:err},"Error on add answers search question select query,question doesn't exist or server side issue");
             res.send({
                 isDone : false,
                 errorMessage : "Question doesnt exist"
@@ -65,12 +71,13 @@ router.post('/r/addanswer',async(req,res)=>{
             mysqlquery = con.format(mysqlquery, inserts);
             con.query(mysqlquery,(err,responseAddAnswer)=>{
                 if(err){
-                    console.log(err);
+                    logger.debug({reqBody:req.body,err:err},"Error on add answer insert query");
                     res.send({
                         isDone : false,
                         errorMessage : "Server side issue"        
                     });
                 }else{
+                    logger.debug({reqBody:req.body},"Add answer insert query success");
                     res.send({
                         isDone: true
                     })
@@ -82,18 +89,18 @@ router.post('/r/addanswer',async(req,res)=>{
 router.post('/r/d/answer',async(req,res)=>{
     let answerid =  req.body.answerid;
     let userid = req.body.userid;
-    console.log("ansreid ",answerid);
     let mysqlquery = "DELETE FROM answer WHERE answerid = ? and userid=?";
     let inserts = [answerid,userid];
     mysqlquery = con.format(mysqlquery, inserts);
     con.query(mysqlquery,(err,responseDeleteAnswer)=>{
         if(err){
-            console.log(err);
+            logger.debug({reqBody:req.body,err:err},"Error on delete answer query");
             res.send({
                 isDone : false,
                 errorMessage : "Server side issue!"
             });
         }else{
+            logger.debug({reqBody:req.body},"Delete answer query success");
             res.send({
                 isDone: true
             });
@@ -108,23 +115,25 @@ router.post('/r/d/question',async(req,res)=>{
     mysqlquery = con.format(mysqlquery1, inserts);
     con.query(mysqlquery,(err,responseDeleteQuestion)=>{
         if(err){
-            console.log(err);
+            logger.debug({reqBody:req.body,err:err},"Error on delete question query");
             res.send({
                 isDone : false,
                 errorMessage : "Server side issue!"
             });
         }else{
+            logger.debug({reqBody:req.body},"Delete question query success only question delete part");
             let mysqlquery1 = "DELETE FROM answer WHERE questionid = ?";
             let inserts = [questionid];
             mysqlquery = con.format(mysqlquery1, inserts);
             con.query(mysqlquery,(err,responseDeleteAnswer)=>{
                 if(err){
-                    console.log(err);
+                    logger.debug({reqBody:req.body,err:err},"Error on delete answer query when deleting question");
                     res.send({
                         isDone : false,
                         errorMessage : "Server side issue!"
                     });
                 }else{
+                    logger.debug({reqBody:req.body},"Delete question query success");
                     res.send({
                         isDone: true
                     });
@@ -145,15 +154,15 @@ router.post('/r/e/question',async(req,res)=>{
     let mysqlquery = "UPDATE question SET question = ? WHERE questionid = ? and userid=?";
     let inserts = [value,editid,userid];
     mysqlquery = con.format(mysqlquery, inserts);
-
     con.query(mysqlquery,(err,responseEditQuestion)=>{
         if(err){
-            console.log(err);
+            logger.debug({reqBody:req.body,err:err},"Error on edit question query");
             res.send({
                 isDone : false,
                 errorMessage : "Server side issue!"
             });
         }else{
+            logger.debug({reqBody:req.body},"Edit question query success");
             res.send({
                 isDone: true
             });
@@ -173,12 +182,13 @@ router.post('/r/e/answer',async(req,res)=>{
     mysqlquery = con.format(mysqlquery, inserts);
     con.query(mysqlquery,(err,responseEditAnswer)=>{
         if(err){
-            console.log(err);
+            logger.debug({reqBody:req.body,err:err},"Error on edit answer query");
             res.send({
                 isDone : false,
                 errorMessage : "Server side issue!"
             });
         }else{
+            logger.debug({reqBody:req.body,err:err},"edit answer query success");
             res.send({
                 isDone: true
             });
@@ -201,9 +211,10 @@ router.post('/r/profile',async(req,res)=>{
 
     con.query(mysqlquery, function(err, results) {
         if (err){
-            console.log(err);
+            logger.debug({reqBody:req.body,err:err},"Error on fetching profile query");
             res.send(null);
         }else{
+            logger.debug({reqBody:req.body},"Fetching profile query success");
             res.send({
                 allFetchStatus : true,
                 username : results[0][0].username,
@@ -222,11 +233,10 @@ router.post('/r/p',async(req,res)=>{
     }
     let mysqlquery = "SELECT password FROM users WHERE userid = ? LIMIT 1";
     let inserts = [userid];
-    console.log("Here:",passwordnew,password,password);
     mysqlquery = con.format(mysqlquery,inserts);
     con.query(mysqlquery,async (err,responseUserAuth)=>{
         if(err){
-            res.send(null);
+            logger.debug({reqBody:req.body,err:err},"Error on select password query while changing password");
             return;
         }else{
             if(responseUserAuth.length === 0){
@@ -237,6 +247,7 @@ router.post('/r/p',async(req,res)=>{
             }else{
                 let passwordMatch = await bcrypt.compare(password,responseUserAuth[0].password);
                 if(!passwordMatch){
+                    logger.debug({reqBody:req.body},"Password change fail, old password didn't match");
                     res.send({
                         isDone : false,
                         errorMessage : "Wrong old password!"
@@ -249,9 +260,11 @@ router.post('/r/p',async(req,res)=>{
                             mysqlquery = con.format(mysqlquery,inserts);
                             con.query(mysqlquery,async (err,responseUserAuth)=>{
                                 if(err){
+                                    logger.debug({reqBody:req.body},"Password change fail, internal issue");
                                     res.send(null);
                                     return;
                                 }else{
+                                    logger.debug({reqBody:req.body},"Password change success");
                                     res.send({
                                         isDone : true
                                     });
@@ -276,10 +289,11 @@ router.post('/login',async (req,res)=>{
             mysqlquery = con.format(mysqlquery, inserts);
             con.query(mysqlquery,async (err,responseUserAuth)=>{
                 if(err){
-                    console.log(err);
+                    logger.debug({reqBody:req.body,err:err},"Login query fail");
                     res.send(null);
                 }else{
                     if(responseUserAuth.length == 0){
+                        logger.debug({reqBody:req.body},"Login fail user doesnt exist");
                         res.send({
                             isLoggedIn : false,
                             errorMessage : "User doesn't exist!"
@@ -287,12 +301,14 @@ router.post('/login',async (req,res)=>{
                     }else{
                         let passwordMatch = await bcrypt.compare(req.body.password,responseUserAuth[0].password);
                         if(!passwordMatch){
+                            logger.debug({reqBody:req.body},"Login failed, password didn't match");
                             res.send({
                                 isLoggedIn : false,
                                 errorMessage : "Incorrect password!"
                             });
                         }else{
                             let token = await jwt.getToken({username : username,userid : responseUserAuth[0].userid});
+                            logger.debug({reqBody:req.body},"Login success");
                             res.send({
                                 isLoggedIn : true,
                                 username : username,
@@ -320,10 +336,11 @@ router.post('/register',async (req,res)=>{
             mysqlquery = con.format(mysqlquery, inserts);
             con.query(mysqlquery,(err,responseUserAuth)=>{
                 if(err){
-                    console.log(err);
+                    logger.debug({reqBody:req.body,err:err},"User register query fail");
                     res.send(null);
                 }else{
                     if(responseUserAuth.length > 0){
+                        logger.debug({reqBody:req.body},"User already exist");
                         res.send({
                             isLoggedIn : false,
                             errorMessage : "User already exist!"
@@ -333,17 +350,18 @@ router.post('/register',async (req,res)=>{
                         mysqlquery = con.format(mysqlquery, inserts);
                         con.query(mysqlquery,(err,responseUserAuthInsert)=>{
                             if(err){
-                                console.log(err);
+                                logger.debug({reqBody:req.body,err:err},"User register fail, insert query");
                                 res.send(null);
                             }else{
                                 mysqlquery = `SELECT username,userid FROM users WHERE username  = ?`;
                                 mysqlquery = con.format(mysqlquery, inserts);
                                 con.query(mysqlquery,async (err,responseUserAuthSelect)=>{
                                     if(err){   
-                                        console.log(err);
+                                        logger.debug({reqBody:req.body,err:err},"Userid fetch query fail");
                                         res.send(null);
                                     }else{
                                         let token = await jwt.getToken({username : username,userid : responseUserAuthSelect[0].userid});
+                                        logger.debug({reqBody:req.body},"Register success");
                                         res.send({
                                             isLoggedIn : true,
                                             username : username,
@@ -364,16 +382,18 @@ router.post('/register',async (req,res)=>{
 router.post('/usertoken',async (req, res) => {
     let dataFromJwt = await jwt.jwtVerify(req.body.token);
     if(dataFromJwt!== null){
-      res.send({
-        tokenValid : true,
-        userid : dataFromJwt.userid,
-        username : dataFromJwt.username
-      });
+        logger.debug({reqBody:req.body},"User token verification success");
+        res.send({
+            tokenValid : true,
+            userid : dataFromJwt.userid,
+            username : dataFromJwt.username
+        });
     }else{
-      res.send({
-        tokenValid : false,
-        username : "fakeAccount"
-      });
+        logger.debug({reqBody:req.body},"User token verification failed");
+        res.send({
+            tokenValid : false,
+            username : "fakeAccount"
+        });
     }
 });
 

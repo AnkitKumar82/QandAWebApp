@@ -4,7 +4,8 @@ var con = mysql.createConnection({
   user: "root",
   password: "Ankit@1234",
   database: "qandadb",
-  multipleStatements: true
+  port : 3306,
+  multipleStatements : true
 });
 con.connect(function(err) {
   if (err) throw err;
