@@ -8,6 +8,7 @@ var con = mysql.createConnection({
   multipleStatements : true
 });
 con.connect(function(err) {
-  if (err) throw err;
+  if (err) console.log("Database not connected",err);
+  else console.log("Database connected");
 });
 module.exports = con;
